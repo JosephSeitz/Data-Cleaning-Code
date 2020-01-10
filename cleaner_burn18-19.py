@@ -1,0 +1,377 @@
+1#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct 18 13:22:20 2019
+
+@author: joey
+"""
+import pandas as pd
+import os
+import numpy as np
+from Raw_Cleaner import timestamp_matcher, time_columns, file_to_df, cutter, \
+    repeat, continuous_df
+
+Burn = int(input("What burn would you like to do? (18 or 19):"))
+#Burn = int(18)
+if Burn ==18:
+    path = "http://35.12.130.8/study/Seitz/10X10_Truss_SERDP_Burns/Raw-Sonic-TC-Data/SERDP-Burn-18/"
+if Burn == 19:
+    path = "http://35.12.130.8/study/Seitz/10X10_Truss_SERDP_Burns/Raw-Sonic-TC-Data/SERDP-Burn-19/"
+
+def compiler():
+    files = ["TOA5_2878.WGcontrol10Hz.dat", "TOA5_2879.ts_data.dat",\
+             "TOA5_3884.ts_data.dat", "TOA5_4390.ts_data.dat", \
+             "TOA5_4975.ts_data.dat", "TOA5_4976.ts_data.dat", \
+             "TOA5_10442.ts_data.dat", "TOA5_11584.ts_data.dat",\
+             "TOA5_11585.ts_data.dat"]
+
+    file_num = ["2878","2879","3884","4390","4975","4976","10442","11584","11585"]
+    ### First Loading the files into the script
+    df_2878 = file_to_df(path, files[0])
+    df_2879 = file_to_df(path, files[1])
+    
+    df_3884 = file_to_df(path, files[2])
+    df_4390 = file_to_df(path, files[3])
+    
+    df_4975 = file_to_df(path, files[4])
+    df_4976 = file_to_df(path, files[5])
+    
+    df_10442 = file_to_df(path, files[6])
+    df_11584 = file_to_df(path, files[7])
+    df_11585 = file_to_df(path, files[8])
+    
+    ### List of dataframes that is needed
+    df_names= [df_2878, df_2879, df_3884, df_4390, df_4975, df_4976, df_10442, df_11584, df_11585]
+    if Burn == 19:
+        #t_s,t_e = timestamp_matcher(df_names,file_num)
+        t_s = "2018-09-22 15:26:15"
+        t_e = "2018-09-22 18:25:21"
+        
+    if Burn == 18:
+        t_s = "2018-09-22 09:05:42"
+        t_e = "2018-09-22 15:19:33"
+        
+    trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    if trim_df.lower() == "y":
+        df_2878 = cutter(df_2878, t_s, t_e)
+        df_2879 = cutter(df_2879, t_s, t_e)
+        df_3884 = cutter(df_3884, t_s, t_e)
+        df_4390 = cutter(df_4390, t_s, t_e)
+        df_4975 = cutter(df_4975, t_s, t_e)
+        df_4976 = cutter(df_4976, t_s, t_e)
+        df_10442 = cutter(df_10442, t_s, t_e)
+        df_11584 = cutter(df_11584, t_s, t_e)
+        df_11585 = cutter(df_11585, t_s, t_e)
+
+    df_names= [df_2878, df_2879, df_3884, df_4390, df_4975, df_4976, df_10442, df_11584, df_11585]
+    
+
+    check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    if check == "y":
+        end_repeat_times = []
+        for i in range(len(df_names)):
+            print(file_num[i]+':')
+            end_repeat_times.append(df_names[i]["TIMESTAMP"][repeat(df_names[i])[-1][-1]+1]) 
+    
+        print("Cut here:",max(end_repeat_times))
+        t_s = max(end_repeat_times)
+        #t_e = pd.TimeStamp("2018-09-22 15:19:33.500000")
+        cut_out_repeat = input("Would you like to cut all data at the end of the repeated times? (y/n):")
+        if cut_out_repeat == "y":     
+            df_2878 = continuous_df(cutter(df_2878, t_s, t_e), t_s, t_e)
+            df_2879 = continuous_df(cutter(df_2879, t_s, t_e), t_s, t_e)
+            df_3884 = continuous_df(cutter(df_3884, t_s, t_e), t_s, t_e)
+            df_4390 = continuous_df(cutter(df_4390, t_s, t_e), t_s, t_e)
+            df_4975 = continuous_df(cutter(df_4975, t_s, t_e), t_s, t_e)
+            df_4976 = continuous_df(cutter(df_4976, t_s, t_e), t_s, t_e)
+            df_10442 =continuous_df(cutter(df_10442, t_s, t_e), t_s, t_e)
+            df_11584 =continuous_df(cutter(df_11584, t_s, t_e), t_s, t_e)
+            df_11585 =continuous_df(cutter(df_11585, t_s, t_e), t_s, t_e)
+    
+    ### Making sure that the data is continuous
+    df_names= [df_2878, df_2879, df_3884, df_4390, df_4975, df_4976, df_10442, df_11584, df_11585]
+   # for df in range(len(df_names)):
+   #     print("File",file_num[df],":")
+   #     df_names[df] = continuous_df(df_names[df], t_s, t_e)
+
+    ### Grabbing Sonic data from specific files
+    sonic_columns=["Ux_","Uy_","Uz_","Ts_", "diag_rmy_"]
+    time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
+    sonc_headers = [ "U", "V", "W", "T", "DIAG"]
+    
+    
+    df_A1, df_A2, df_A3, df_A4 = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    df_B1, df_B2, df_B3, df_B4 = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    df_C1, df_C2, df_C3, df_C4 = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    df_D1, df_D2, df_D3, df_D4 = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    
+    a_row_lst = [df_A1, df_A2, df_A3, df_A4]
+    b_row_lst = [df_B1, df_B2, df_B3, df_B4]
+    c_row_lst = [df_C1, df_C2, df_C3, df_C4]
+    d_row_lst = [df_D1, df_D2, df_D3, df_D4 ]
+    
+    all_sonics = a_row_lst+ b_row_lst + c_row_lst +d_row_lst
+    
+    ###  Burns truss:
+    #seperate_time = input("Would you like to seperate the Timestamp? (y/n)")
+    seperate_time = "n"
+    if seperate_time == "y":
+        df_2879_time, df_4975_time  = time_columns(df_2879), time_columns(df_4975)
+        df_4976_time, df_11585_time = time_columns(df_4976), time_columns(df_11585)
+        df_10442_time, df_3884_time = time_columns(df_10442), time_columns(df_3884)
+        df_11584_time, df_4390_time = time_columns(df_11584), time_columns(df_4390)
+    
+    ### WG Nover 10hz
+    df_WGNover = pd.DataFrame()
+    
+    if seperate_time =="y":
+        df_2878_time = time_columns(df_2878)
+        for t in time_columns_lst:
+            df_WGNover[t] = df_2878_time[t]
+    
+    if seperate_time =="n":
+        df_WGNover["TIMESTAMP"] = df_2878["TIMESTAMP"]
+    
+    for col in range(len(sonic_columns)):
+        df_WGNover[sonc_headers[col]] = df_2878[sonic_columns[col]+"1"]
+        
+    for n in range(len(a_row_lst)):
+        if seperate_time =="y":
+            for i in range(len(time_columns_lst)):
+                a_row_lst[n][time_columns_lst[i]]=df_2879_time[time_columns_lst[i]]
+                b_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
+                c_row_lst[n][time_columns_lst[i]]=df_4976_time[time_columns_lst[i]]
+                d_row_lst[n][time_columns_lst[i]]=df_11585_time[time_columns_lst[i]]
+                
+        if seperate_time =="n":
+            a_row_lst[n]["TIMESTAMP"]=df_2879["TIMESTAMP"]
+            b_row_lst[n]["TIMESTAMP"]=df_4975["TIMESTAMP"]
+            c_row_lst[n]["TIMESTAMP"]=df_4976["TIMESTAMP"]
+            d_row_lst[n]["TIMESTAMP"]=df_11585["TIMESTAMP"]
+            
+        for i in range(len(sonic_columns)):
+            a_row_lst[n][sonc_headers[i]] = df_2879[sonic_columns[i]+str(n+1)]
+            b_row_lst[n][sonc_headers[i]] = df_4975[sonic_columns[i]+str(n+1)]
+            c_row_lst[n][sonc_headers[i]] = df_4976[sonic_columns[i]+str(n+1)]
+            d_row_lst[n][sonc_headers[i]] = df_11585[sonic_columns[i]+str(n+1)]
+        
+
+    #### Thermal Couple data
+    time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
+    
+    df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc = pd.DataFrame(),pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    
+    df_B5_tc, df_B6_tc, df_B7_tc = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    df_C5_tc, df_C6_tc, df_C7_tc = pd.DataFrame(),pd.DataFrame(),pd.DataFrame()
+    
+    t_c_lst_1 = ["Temp_C(1)","Temp_C(2)","Temp_C(3)","Temp_C(4)","Temp_C(5)","Temp_C(6)","Temp_C(7)"]
+    t_c_lst_2 = ["Temp_C(8)","Temp_C(9)","Temp_C(10)","Temp_C(11)","Temp_C(12)","Temp_C(13)","Temp_C(14)"]
+    
+    first_tc_group = [ df_B2_tc, df_B6_tc, df_B1_tc, df_B5_tc,\
+                       df_C1_tc, df_C5_tc, df_C2_tc, df_C6_tc]
+    
+    secnd_tc_group = [ df_B4_tc, df_B3_tc, df_B7_tc,\
+                      df_C3_tc, df_C7_tc, df_C4_tc]
+    
+    df_tc_lst_1 = [df_2879, df_10442, df_4975, df_3884, df_4976, df_11584,\
+                df_11585, df_4390]
+    if seperate_time =="y":
+        df_time_lst_1 =[df_2879_time, df_10442_time,df_4975_time,df_3884_time,\
+                    df_4976_time, df_11584_time, df_11585_time, df_4390_time]
+    
+    for j in range(len(first_tc_group)):
+        if seperate_time =="y": 
+            for t in range(len(time_columns_lst)):
+                first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        if seperate_time =="n":
+            first_tc_group[j]["TIMESTAMP"]= df_tc_lst_1[j]["TIMESTAMP"]
+        for i in range(len(t_c_lst_1)):
+            first_tc_group[j][t_c_lst_1[i]]= df_tc_lst_1[j][t_c_lst_1[i]]
+            
+    df_tc_lst_2 = [df_2879, df_4975, df_3884, df_4976, df_11584, df_11585]
+    if seperate_time =="y":
+        df_time_lst_2 = [df_2879_time, df_4975_time,df_3884_time,df_4976_time,\
+                   df_11584_time, df_11585_time]
+    
+    for j in range(len(secnd_tc_group)):
+        
+        if seperate_time =="y":  
+            for t in range(len(time_columns_lst)):
+                secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        if seperate_time == "n":
+            secnd_tc_group[j]["TIMESTAMP"]= df_tc_lst_2[j]["TIMESTAMP"]
+        for i in range(len(t_c_lst_2)):
+                secnd_tc_group[j][t_c_lst_2[i]]= df_tc_lst_2[j][t_c_lst_2[i]]
+                
+    all_tc_group = [df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc, df_B5_tc,\
+                    df_B6_tc, df_B7_tc,df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc,\
+                    df_C5_tc, df_C6_tc, df_C7_tc]
+
+    return all_sonics, all_tc_group, df_WGNover
+    
+def correction():
+    all_sonics, all_tc_group, df_WGNover = compiler()
+    nam_snc=["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1","C2",\
+                   "C3","C4","D1","D2","D3","D4"]
+    nam_tc = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "C1","C2","C3","C4",\
+                    "C5", "C6", "C7"]
+    #wind speed correction
+    m_speed,min_T = 40, -10
+    u_fctr, v_fctr = -1, -1
+    
+    fmt = "Default Corrections: {}*U, {}*V, Max Wind Speed=|{}| m/s, Min Temperature = {} C  " 
+    print(fmt.format(u_fctr,v_fctr,m_speed,min_T))
+    
+    nw_corct = input("Would you like to change these corrections? (y/n): ")
+    if nw_corct.lower() == "y":
+        u_fctr = float(input("What to multiply the U values by?:"))
+        v_fctr = float(input("What to multiply the V values by?:"))
+        m_speed = float(input("What bounds do you want for the wind speed? (m/s):"))
+        min_T = float(input("What is the minimum temperatue? (C):"))
+    
+    fill_nan = np.nan
+    change_nan = input("Would you like to change the NaN's to a different value? (y/n):")
+    if change_nan == "y":
+        fill_nan = input("What to replace NaN's with? ex: 9999:")
+    
+    for df in range(len(all_sonics)):
+        print("Sonic",nam_snc[df],":")
+        all_sonics[df] = apply_correction(all_sonics[df],u_fctr,v_fctr,m_speed,min_T,fill_nan)
+    df_WGNover = apply_correction(df_WGNover,u_fctr,v_fctr,m_speed,min_T,fill_nan)
+    
+    for df in range(len(all_tc_group)):
+        print("Thermocouple ",nam_tc[df],":")
+        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[1:8])
+        
+    return all_sonics, all_tc_group, df_WGNover
+
+def apply_correction(df,u_fctr,v_fctr,m_speed,min_T,fill_nan):
+
+    ##For loop for all the sonics
+    df["U"] *= u_fctr
+    df["V"] *= v_fctr
+    
+    indx = []
+    for i in range(len(df)):
+        if df["DIAG"][i] != 0.0:
+            df.at[i,["U","V","W","T"]] = fill_nan
+            indx.append(i)
+            indx.append(i)
+            indx.append(i)
+            indx.append(i)
+            continue
+        
+        if np.abs(df["U"][i]) > m_speed:
+            df.at[i, "U"] = fill_nan
+            #df["U"][i] =fill_nan
+            indx.append(i)
+            
+        if  np.abs(df["V"][i])> m_speed:
+            df.at[i, "V"] = fill_nan
+            #df["V"][i] =fill_nan
+            indx.append(i)
+            
+        if np.abs(df['W'][i])> m_speed:
+            df.at[i, "W"] = fill_nan
+            #df['W'][i] = fill_nan
+            indx.append(i)
+            
+        if df['T'][i] < min_T:
+            df.at[i, "T"] = fill_nan
+            #df['T'][i] = fill_nan
+            indx.append(i)
+    
+    if len(indx) ==0:
+        print("Data fits these limits")
+    if len(indx) != 0:
+        print("Removed "+str(len(indx))+" Values" )
+    
+    df.fillna(value=fill_nan, inplace=True)
+    df = df.drop("DIAG", axis=1)
+    return df
+
+def apply_tc_correction(df, min_T, fill_nan, tc_columns):
+    indx = []
+    for i in range(len(df)):    
+        for col in range(len(tc_columns)):
+            if df[tc_columns[col]][i] < min_T:
+                df.at[i, tc_columns[col]] = fill_nan
+                #df[tc_columns[col]][i] = fill_nan
+                indx.append(i)
+            #print("--"*15,"LINE:",i,"--"*15)
+            #print(df.iloc[[i]])
+    
+    df.fillna(value=fill_nan, inplace=True)        
+    if len(indx) ==0:
+        print("Data fits these limits")
+    if len(indx) != 0:
+        print("Removed "+str(len(indx))+" Values" )
+
+    
+    return df
+    
+def timestamp_col(df):
+   # drop_col = ["YYYY", "MM", "DD", "Hr", "Min", "Sec"]
+    #timestamp_lst = list(np.full(len(df), np.nan))
+    #for t in range(len(df)):
+    #    timestamp_lst[t] = pd.Timestamp(str(df["YYYY"][t])+"-"+str(df["MM"][t])+"-"+str(df["DD"][t]) +" "+str(df["Hr"][t])+":"+str(df["Min"][t])+":"+str(df["Sec"][t]),freq = ".1S")
+    
+    #df.insert(0, column= "TIMESTAMP", value = timestamp_lst)
+    #df = df.drop(drop_col, axis=1)
+    col = df.pop("TIMESTAMP")
+    df = df.insert(0, col.name, col)
+    return df
+
+def saver():
+    
+    all_sonics, all_tc_group, df_WGNover = correction()
+      
+    #TS = input("Would you like to have a single time stamp column? (y/n):")
+    #TS = "y" 
+    #if TS== "y":
+    #    for i in range(len(all_sonics)):
+    #        all_sonics[i] = timestamp_col(all_sonics[i])
+    #    for i in range(len(all_tc_group)):
+    #        all_tc_group[i] = timestamp_col(all_tc_group[i])
+    #    df_WGNover = timestamp_col(df_WGNover)
+        
+    ### Creating the directories to save the data
+    save_me = input("Would you like to save the data into the working directory? (y/n):")
+    if save_me == "y":
+        cwd = os.getcwd()
+    else:
+        cwd = input("Full path of save directory:")
+        
+    save_dir = "Burn-"+str(Burn)
+    os.mkdir(cwd+"/" + save_dir)
+    
+    tc_dir =cwd+"/" + save_dir + "/thermal_couples"
+    sonic_dir =cwd+"/" + save_dir + "/sonics"
+    
+    os.mkdir(tc_dir)
+    os.mkdir(sonic_dir)
+
+    ### Save the Sonic data
+    save_as_lst = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1","C2",\
+                   "C3","C4","D1","D2","D3","D4"]
+    for i in range(len(all_sonics)):
+        sv_file = sonic_dir+'/'+save_as_lst[i]+"_UVWT_Burn-"+str(Burn)+".txt"
+        all_sonics[i].to_csv(sv_file, sep=' ',index=False)
+    df_WGNover.to_csv(sonic_dir+'/WGNover_UVWT_Burn-'+str(Burn)+".txt",sep=' ',index=False)
+
+    ### Saving Thermal Couple dataframes
+    
+    save_as_lst = ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "C1","C2","C3",\
+                          "C4", "C5", "C6", "C7"]
+    for i in range(len(all_tc_group)):
+        all_tc_group[i] = all_tc_group[i].round(3)
+        sv_file=tc_dir+'/'+save_as_lst[i]+"_thermal_couple_Burn-"+str(Burn)+".txt"
+        all_tc_group[i].to_csv(sv_file, sep=' ',index=False)
+    print("You now have the Burn sonics and thermocouple saved")
+
+
+
+saver()
+
+
