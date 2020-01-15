@@ -13,7 +13,7 @@ from Raw_Cleaner import timestamp_matcher, time_columns, file_to_df, cutter, \
     repeat, timestamp_correction, day_trimmer
     
 ### W10 location
-path = "C:/Users/joeyp/Desktop/2019-SERDP-Raw/SERDP_SLEF_Burn_data/" \
+path = "C:/Users/joeyp/Desktop/2019-SERDP-Raw/" \
         "Large-scale-burn-experiment-March-13-2019/" \
         "Overstory-towers-burn-data-March-13-2019/"
 ### 79 location
@@ -67,11 +67,11 @@ def Compiler():
                 'Temp_C(7)']
     raw_column_m = ['TIMESTAMP', 'RECORD', 'Ux_1', 'Uy_1', 'Uz_1', 'Ts_1', \
                     'diag_rmy_1','Ux_2', 'Uy_2', 'Uz_2', 'Ts_2','diag_rmy_2', \
-                    'Ux_3', 'Uy_3','Uz_3','Ts_3','diag_rmy_3','Temp_C(0.25 m)'\
+                    'Ux_3', 'Uy_3','Uz_3','Ts_3','diag_rmy_3','Temp_C(0.25 m)',\
                     'Temp_C(0.5 m)', 'Temp_C(1.0 m)', 'Temp_C(2.0 m)', \
                     'Temp_C(3.0 m)', 'Temp_C(4.0 m)', 'Temp_C(5.0 m)', \
                     'Temp_C(6.0 m)', 'Temp_C(7.0 m)', 'Temp_C(8.0 m)', \
-                    'Temp_C(9.0 m)', 'Temp_C(10.0 m)', 'Temp_C(15 m)']
+                    'Temp_C(9.0 m)', 'Temp_C(10.0 m)']
     
     for i in range(len(df_names)):
         print("Columns for:",tower_names[i])
@@ -96,7 +96,7 @@ def Compiler():
     
     out_tc = ["TC(15m)", "TC(10m)", "TC(5m)", "TC(2.5m)", "TC(1.25m)",\
               "TC(0.5m)", "TC(0.25m)"]
-    out_mobile_tc =['TC(15.0m)','TC(10.0m)', 'TC(9.0m)', 'TC(8.0m)', 'TC(7.0m)', 'TC(6.0m)',\
+    out_mobile_tc =['TC(10.0m)', 'TC(9.0m)', 'TC(8.0m)', 'TC(7.0m)', 'TC(6.0m)',\
             'TC(5.0m)', 'TC(4.0m)', 'TC(3.0m)', 'TC(2.0m)', 'TC(1.0m)', 'TC(0.5m)','TC(0.25m)']
     
     sonic_heights = ["(19m)", "(9.5m)", "(3m)"]
@@ -110,7 +110,6 @@ def Compiler():
             out_sonic_mobile.append(sonic_headers[j]+mobile_heights[i])
     out_columns=out_sonic+out_tc
     out_columns_mobile = out_sonic_mobile + out_mobile_tc
-    print(out_columns_mobile)
     raw_data_col = ['Ux_1', 'Uy_1', 'Uz_1', 'Ts_1', 'diag_rmy_1', 'Ux_2', 'Uy_2', \
                 'Uz_2', 'Ts_2', 'diag_rmy_2', 'Ux_3', 'Uy_3', 'Uz_3', 'Ts_3', \
                 'diag_rmy_3', 'Temp_C(1)', 'Temp_C(2)', 'Temp_C(3)', 'Temp_C(4)', \
@@ -118,11 +117,11 @@ def Compiler():
     
     raw_data_col_m = [ 'Ux_1', 'Uy_1', 'Uz_1', 'Ts_1', \
                     'diag_rmy_1','Ux_2', 'Uy_2', 'Uz_2', 'Ts_2','diag_rmy_2', \
-                    'Ux_3', 'Uy_3', 'Uz_3','Ts_3', 'diag_rmy_3','Temp_C(15 m)', \
+                    'Ux_3', 'Uy_3', 'Uz_3','Ts_3', 'diag_rmy_3', \
                     'Temp_C(10.0 m)', 'Temp_C(9.0 m)', 'Temp_C(8.0 m)', \
                     'Temp_C(7.0 m)', 'Temp_C(6.0 m)', 'Temp_C(5.0 m)', \
                     'Temp_C(4.0 m)', 'Temp_C(3.0 m)', 'Temp_C(2.0 m)', \
-                    'Temp_C(1.0 m)', 'Temp_C(0.5)', "Temp_C(0.25 m)"]
+                    'Temp_C(1.0 m)', 'Temp_C(0.5 m)', "Temp_C(0.25 m)"]
     
     df_Control_out, df_East_out = pd.DataFrame(), pd.DataFrame()
     df_Mobile_out, df_Flux_out  = pd.DataFrame(), pd.DataFrame()
@@ -134,10 +133,10 @@ def Compiler():
     for d in range(len(df_out_lst)):
         df_out_lst[d][time_columns_lst]=time_columns(df_names[d])[time_columns_lst]
         df_out_lst[d][out_columns] = df_names[d][raw_data_col]
-
+    
     df_Mobile_out[time_columns_lst] = time_columns(df_Mobile)[time_columns_lst]
     df_Mobile_out[out_columns_mobile] = df_Mobile[raw_data_col_m]
-
+    print(df_Mobile_out.columns)
     return df_out_lst, out_sonic, out_tc, df_Mobile_out, out_sonic_mobile, out_mobile_tc 
 
 def correction():
@@ -169,7 +168,7 @@ def correction():
                   m_speed, min_T, fill_nan, out_tc, out_sonic)
     print("Tower Mobile :")
     df_Mobile_out = apply_correction(df_Mobile_out, u_fctr, v_fctr, m_speed, \
-                            min_T, fill_nan, out_mobile_tc, out_sonic_mobile \
+                            min_T, fill_nan, out_mobile_tc, out_sonic_mobile, \
                                      ['U(21.6m)','U(9.1m)', 'U(3.4m)'], \
                                      ['V(21.6m)','V(9.1m)', 'V(3.4m)'], \
                                      ["(21.6m)", "(9.1m)", "(3.4m)"], \
@@ -187,7 +186,7 @@ def apply_correction(df,u_fctr,v_fctr,m_speed,min_T,fill_nan, out_tc, out_sonic,
     ##For loop for all the sonics
     #adjust_U = ['U(19m)', 'U(9.5m)', 'U(3m)']
     #adjust_V = ['V(19m)', 'V(9.5m)', 'V(3m)']
-
+    
     
     #adjust_temp = ['T_19m', 'T_9.5m', 'T_3m']
     for i in range(len(adjust_U)):
@@ -231,7 +230,15 @@ def apply_correction(df,u_fctr,v_fctr,m_speed,min_T,fill_nan, out_tc, out_sonic,
         print("Data fits these limits")   
     if len(indx) != 0:
         print("Removed "+str(len(indx))+" Values" )
-    df = column_formater(df, out_tc)
+    
+    if adjust_U[0] == 'U(21.6m)':
+        m_sonic = ['U(21.6m)', 'V(21.6m)', 'W(21.6m)', \
+                    'T(21.6m)', 'U(9.1m)', 'V(9.1m)', 'W(9.1m)', 'T(9.1m)', \
+                    'U(3.4m)', 'V(3.4m)', 'W(3.4m)', 'T(3.4m)']
+        df = column_formater(df, out_tc, m_sonic)
+    if adjust_U[0] != 'U(21.6m)':
+        df = column_formater(df, out_tc)
+    
     df.fillna(value=fill_nan, inplace=True)
     
     df = df.drop(DIAG_lst, axis=1)
