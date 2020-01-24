@@ -44,6 +44,8 @@ def Compiler():
     df_Control = df_Control.drop("diag_rmy_4", axis=1)
     df_East    = timestamp_correction(file_to_df(path,burn_files[1],3,1,False))
     df_Flux    = timestamp_correction(file_to_df(path,burn_files[2],3,1,False))
+    df_Flux["Ux_2"] *= -1
+    df_Flux["Ux_3"] *= -1
     df_Mobile  = timestamp_correction(file_to_df(path,burn_files[3],6,3,False))
     df_North   = timestamp_correction(file_to_df(path,burn_files[4],3,1,False))
     df_West    = timestamp_correction(file_to_df(path,burn_files[5],3,1,False))

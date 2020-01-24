@@ -41,6 +41,7 @@ def Compiler():
     df_Control = timestamp_correction(file_to_df(path,burn_files[0],6,3,False))
     df_East    = timestamp_correction(file_to_df(path,burn_files[1],6,3,False))
     df_Flux    = timestamp_correction(file_to_df(path,burn_files[2],6,3,False))
+    df_Flux["Ux_1"] *= -1
     df_North   = timestamp_correction(file_to_df(path,burn_files[5],6,3,False))
     df_West    = timestamp_correction(file_to_df(path,burn_files[6],6,3,False))
     

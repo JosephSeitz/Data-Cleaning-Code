@@ -41,6 +41,7 @@ def Compiler():
     df_Control = timestamp_correction(file_to_df(path,pre_files[0],7,3,False))
     df_East    = timestamp_correction(file_to_df(path,pre_files[1],7,3,False))
     df_Flux    = timestamp_correction(file_to_df(path,pre_files[2],7,3,False))
+    df_Flux["Ux_1"] *= -1
     df_North   = timestamp_correction(file_to_df(path,pre_files[3],7,3,False))
     df_West    = timestamp_correction(file_to_df(path,pre_files[4],7,3,False))
     
