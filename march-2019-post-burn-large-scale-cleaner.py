@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jan 15 15:49:18 2020
@@ -245,7 +246,7 @@ def Saver():
         os.mkdir(save_dir)
     
     for i in range(len(df_out_lst)):
-        sv_file = save_dir+"/burn-"+tower_names[i].lower()+"_tower.txt"
+        sv_file = save_dir+"/post-burn-"+tower_names[i].lower()+"_tower.txt"
         df_out_lst[i].to_csv(sv_file, sep=' ',index=False)
        
 Saver()

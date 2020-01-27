@@ -13,13 +13,13 @@ from Raw_Cleaner import timestamp_matcher, time_columns, file_to_df, cutter, \
     repeat, timestamp_correction, day_trimmer
     
 ### W10 location
-#path = "/Users/joeyp/Desktop/2019-SERDP-Raw/SERDP_SLEF_Burn_data/" +\
-#        "Large-scale-burn-experiment-March-13-2019/" +\
-#        "Overstory-towers-preburn-data-March-12-2019/"
+path = "C:/Users/joeyp/Desktop/2019-SERDP-Raw/" \
+        "Large-scale-burn-experiment-March-13-2019/" \
+        "Overstory-towers-preburn-data-March-12-2019/"
 ### 79 location
-path = '/home/joey/Desktop/2019-SERDP-Raw/SERDP_SLEF_Burn_data/' +\
-            'Large-scale-burn-experiment-March-13-2019/' + \
-            'Overstory-towers-preburn-data-March-12-2019/'
+#path = '/home/joey/Desktop/2019-SERDP-Raw/SERDP_SLEF_Burn_data/' +\
+#            'Large-scale-burn-experiment-March-13-2019/' + \
+#            'Overstory-towers-preburn-data-March-12-2019/'
 
 ## 134 Location
 #path = '/home/JoeySeitz/2019-SERDP-Raw/SERDP_SLEF_Burn_data/'+ \
