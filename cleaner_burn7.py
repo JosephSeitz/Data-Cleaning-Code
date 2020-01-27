@@ -68,7 +68,8 @@ def compiler_b7():
 
     df_names= [ df_2879, df_3884, df_4390, df_4975, df_4976, df_10442,\
                df_11584, df_11585]
-    check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    #check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    check = "y"
     if check == "y":
         end_repeat_times = []
         for i in range(len(df_names)):
@@ -89,6 +90,11 @@ def compiler_b7():
             df_11584 = continuous_df(cutter(df_11584, t_s, t_e), t_s, t_e)
             df_11585 = continuous_df(cutter(df_11585, t_s, t_e), t_s, t_e)
         
+        ##Correction for flipped sonics
+        cor_col = ["Ux_1", "Ux_2", "Ux_3", "Ux_4"]
+        for i in range(len(cor_col)):
+            df_4975[cor_col[i]] *= -1 #A Truss
+            df_11584[cor_col[i]] *= -1 #C Truss       
         ### Check if the timestamps are continous
         df_names= [ df_2879, df_3884, df_4390, df_4975, df_4976, df_10442,\
                df_11584, df_11585]
@@ -199,7 +205,7 @@ def correction():
     nam_tc = ["B1", "B2", "B3", "B4","B5","B6","B7","C1","C2","C3","C4","C5",\
                      "C6","C7"]
     #wind speed correction
-    m_speed,min_T = 50, -40
+    m_speed,min_T = 40, 0
     u_fctr, v_fctr = -1, -1
     
     fmt = "Default Corrections: {}*U, {}*V, Max Wind Speed=|{}| m/s, Min Temperature = {} C  " 
@@ -218,7 +224,7 @@ def correction():
         fill_nan = input("What to replace NaN's with? ex: 9999:")
     
     for df in range(len(all_sonics)):
-        print("Sonic:",nam_snc[df],":")
+        print("Sonic",nam_snc[df],":")
         all_sonics[df] = apply_correction(all_sonics[df],u_fctr,v_fctr,m_speed,min_T,fill_nan)
     #df_WGNover = apply_correction(df_WGNover,u_fctr,v_fctr,m_speed,min_T,fill_nan)
     for df in range(len(all_tc_group)):
@@ -324,7 +330,7 @@ def saver_b7():
     else:
         cwd = input("Full path of save directory:")
         
-    save_dir = "Burn-"+str(Burn)
+    save_dir = "Burn-0"+str(Burn)
     os.mkdir(cwd+"/" + save_dir)
     
     tc_dir =cwd+"/" + save_dir + "/thermal_couples"
@@ -337,7 +343,7 @@ def saver_b7():
     save_as_lst = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1","C2",\
                    "C3","C4","D1","D2","D3","D4"]
     for i in range(len(all_sonics)):
-        sv_file = sonic_dir+'/'+save_as_lst[i]+"_UVWT_Burn-"+str(Burn)+".txt"
+        sv_file = sonic_dir+'/'+save_as_lst[i]+"_UVWT_Burn-0"+str(Burn)+".txt"
         all_sonics[i].to_csv(sv_file, sep=' ',index=False)
     #df_WGNover.to_csv(sonic_dir+'/WGNover_UVWT_Burn-'+str(Burn)+".txt",sep='\t',index=False)
 
@@ -348,7 +354,7 @@ def saver_b7():
     
     for i in range(len(all_tc_group)):
         all_tc_group[i] = all_tc_group[i].round(3)
-        sv_file=tc_dir+'/'+save_as_lst[i]+"_thermal_couple_Burn-"+str(Burn)+".txt"
+        sv_file=tc_dir+'/'+save_as_lst[i]+"_thermal_couple_Burn-0"+str(Burn)+".txt"
         all_tc_group[i].to_csv(sv_file, sep=" ",index=False)
     print("You now have the Burn sonics and thermocouple saved")
 
