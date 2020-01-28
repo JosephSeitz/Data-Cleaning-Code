@@ -91,7 +91,7 @@ def compiler_b7():
             df_11585 = continuous_df(cutter(df_11585, t_s, t_e), t_s, t_e)
         
         ##Correction for flipped sonics
-        cor_col = ["Ux_1", "Ux_2", "Ux_3", "Ux_4"]
+        cor_col = ["Ux_1", "Ux_2", "Ux_3", "Ux_4", "Uz_1","Uz_2","Uz_3","Uz_4"]
         for i in range(len(cor_col)):
             df_4975[cor_col[i]] *= -1 #A Truss
             df_11584[cor_col[i]] *= -1 #C Truss       
