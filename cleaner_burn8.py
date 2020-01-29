@@ -307,8 +307,8 @@ def saver_b8():
     
     all_sonics, all_tc_group, df_WGNover = correction()
    
-    #TS = input("Would you like to have a single time stamp column? (y/n):")
-    TS = "y" 
+    TS = input("Would you like to have a single time stamp column? (y/n):")
+    #TS = "y" 
     if TS== "y":
         for i in range(len(all_sonics)):
             all_sonics[i] = timestamp_col(all_sonics[i])
