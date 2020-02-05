@@ -15,10 +15,10 @@ Burn = int(input("What Burn would you like to clean? (20-34):"))
     
 def pick_burn(burn):
     
-    path_20_22 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
-                    "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/"
-    #path_20_22 = "/home/joey/Desktop/10X10_Truss_SERDP_Burns/"\
-    #               "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/" #79
+    #path_20_22 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
+    #                "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/"
+    path_20_22 = "/home/joey/Desktop/10X10_Truss_SERDP_Burns/"\
+                   "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/" #79
     
     path_23_26 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
                     "Raw-Sonic-TC-Data/SERDP-Burns-23-to-26/"
@@ -412,8 +412,8 @@ def saver():
     
     all_sonics, all_tc_group, df_WGNover = correction()
       
-    #TS = input("Would you like to have a single time stamp column? (y/n):")
-    TS = "y" 
+    TS = input("Would you like to have a single time stamp column? (y/n):")
+    #TS = "y" 
     if TS== "y":
         for i in range(len(all_sonics)):
             all_sonics[i] = timestamp_col(all_sonics[i])
