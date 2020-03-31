@@ -327,3 +327,50 @@ def continuous_df(df_raw, t_s, t_e, frequency = ".1S"):
         print("There Were",gaps,"Missing Timestamps")
 
         return df
+
+def scalar_wind_tilt_correction(u_i, v_i, theta = 135):
+    """
+    This function takes U and V wind components and will correct by a 
+    specified amount. Default is 135 due to SERDP Flux tower.
+    
+    Inputs:
+        u_i - the U wind component 
+        v_i - the V wind component 
+        theta - angle of desired correction in degrees (default 135 due to the
+                                                        march 2019 flux tower)
+    
+    Outputs:
+        u_f - corrected U  wind component
+        v_f - corrected V  wind component
+    """
+    
+    u_f = u_i * np.cos(theta*np.pi/180) - v_i * np.sin(theta*np.pi/180)
+    v_f = u_i * np.sin(theta*np.pi/180) + v_i * np.cos(theta*np.pi/180)
+    
+    return u_f, v_f
+    
+def df_wind_tilt_correction(df, theta = 135, U_col = "U(19m)", V_col = "V(19m)"):
+    """
+    This function combined with the 'scalar_wind_tilt_correction' function will
+    correct a data frame with U or V columns and apply the angle of correction.
+    
+    Inputs:
+        df - pandas dataframe containing the U and V columns
+        theta - angle of desired correction in degrees (default 
+                +135 for  SERDP March 2019 Flux tower)
+        U_col - the column name containing the U wind components ( default 
+                "U(19)" for  SERDP March 2019 Flux tower)
+        V_col - the column name containing the V wind components ( default 
+                "U(19)" for  SERDP March 2019 Flux tower)
+    
+    Outputs:
+        df - The pandas dataframe with the corrected wind columns
+    """
+    u_list, v_list = np.full(len(df), np.nan), np.full(len(df), np.nan)
+    for i in range(len(df)):
+        u_list[i], v_list[i] = scalar_wind_tilt_correction(float(df[U_col][i]),\
+                                                float(df[V_col][i]),theta)
+             
+    df[U_col], df[V_col] = list(u_list), list(v_list)
+
+    return df

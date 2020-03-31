@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import numpy as np
 from Raw_Cleaner import timestamp_matcher, time_columns, file_to_df, cutter, \
-    repeat, timestamp_correction, day_trimmer
+    repeat, timestamp_correction, day_trimmer, df_wind_tilt_correction
     
 ### W10 location
 path = "C:/Users/joeyp/Desktop/2019-SERDP-Raw/" \
@@ -43,9 +43,9 @@ def Compiler():
     df_Control = timestamp_correction(file_to_df(path,burn_files[0],3,1,False))
     df_Control = df_Control.drop("diag_rmy_4", axis=1)
     df_East    = timestamp_correction(file_to_df(path,burn_files[1],3,1,False))
-    df_Flux    = timestamp_correction(file_to_df(path,burn_files[2],3,1,False))
-    df_Flux["Ux_2"] *= -1
-    df_Flux["Ux_3"] *= -1
+    df_Flux    = df_wind_tilt_correction (timestamp_correction(file_to_df(path,\
+                                                burn_files[2],3,1,False)))
+
     df_Mobile  = timestamp_correction(file_to_df(path,burn_files[3],6,3,False))
     df_North   = timestamp_correction(file_to_df(path,burn_files[4],3,1,False))
     df_West    = timestamp_correction(file_to_df(path,burn_files[5],3,1,False))
