@@ -45,7 +45,9 @@ def compiler_b8():
 
     t_s,t_e = timestamp_matcher(df_names,file_num)
     
-    trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    #trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    trim_df = "y"
+    print("Triming the Timestamps")
     if trim_df.lower() == "y":
         df_2879 = cutter(df_2879, t_s, t_e)
         df_3884 = cutter(df_3884, t_s, t_e)
@@ -58,7 +60,9 @@ def compiler_b8():
 
     df_names= [ df_2879, df_3884, df_4390, df_4975, df_4976, df_10442,\
                df_11584, df_11585]
-    check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    #check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    check = "y"
+    print("Checking for repeats")
     if check == "y":
         end_repeat_times = []
         for i in range(len(df_names)):
@@ -69,7 +73,8 @@ def compiler_b8():
         
         t_s = max(end_repeat_times)
     
-        cut_out_repeat = input("Would you like to cut all data at the end of the repeated times? (y/n):")
+        #cut_out_repeat = input("Would you like to cut all data at the end of the repeated times? (y/n):")
+        cut_out_repeat = "y"
         if cut_out_repeat == "y":    
             df_2879 = continuous_df(cutter(df_2879, t_s, t_e), t_s, t_e)
             df_3884 = continuous_df(cutter(df_3884, t_s, t_e), t_s, t_e)
@@ -121,6 +126,11 @@ def compiler_b8():
     #    df_WGNover[t] = df_2878_time[t]
     #    
     for n in range(len(a_row_lst)):
+        for i in range(len(time_columns_lst)):
+            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
+            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
+            c_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
+            d_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
         
         for i in range(len(sonic_columns)):
             a_row_lst[n][sonc_headers[i]] = df_4975[sonic_columns[i]+str(n+1)]
@@ -128,11 +138,7 @@ def compiler_b8():
             c_row_lst[n][sonc_headers[i]] = df_11584[sonic_columns[i]+str(n+1)]
             d_row_lst[n][sonc_headers[i]] = df_4390[sonic_columns[i]+str(n+1)]
         
-        for i in range(len(time_columns_lst)):
-            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
-            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
-            c_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
-            d_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
+        
 
     #### Thermal Couple data
     time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
@@ -158,11 +164,13 @@ def compiler_b8():
     df_time_lst_1 =[df_4975_time, df_2879_time, df_3884_time, df_10442_time,\
                     df_11585_time, df_4976_time, df_4390_time, df_11584_time]
     for j in range(len(first_tc_group)):
+        for t in range(len(time_columns_lst)):
+            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_1)):
             first_tc_group[j][t_c_lst_1[i]]= df_tc_lst_1[j][t_c_lst_1[i]]
            
-        for t in range(len(time_columns_lst)):
-            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
     
     df_tc_lst_2 = [df_2879, df_4975, df_10442, df_4976, df_11585, df_11584]
     
@@ -170,11 +178,13 @@ def compiler_b8():
                    df_11585_time, df_11584_time]
     
     for j in range(len(secnd_tc_group)):
+        for t in range(len(time_columns_lst)):
+            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_2)):
             secnd_tc_group[j][t_c_lst_2[i]]= df_tc_lst_2[j][t_c_lst_2[i]]
            
-        for t in range(len(time_columns_lst)):
-            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
    
     all_tc_group = [df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc, df_B5_tc,\
                     df_B6_tc, df_B7_tc,df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc,\
@@ -189,7 +199,7 @@ def correction():
     nam_tc = ["B1", "B2", "B3", "B4","B5","B6","B7","C1","C2","C3","C4","C5",\
                  "C6","C7"]
     #wind speed correction
-    m_speed,min_T = 50, -20
+    m_speed,min_T = 40, 0
     u_fctr, v_fctr = -1, -1
     
     fmt = "Default Corrections: {}*U, {}*V, Max Wind Speed=|{}| m/s, Min Temperature = {} C  " 
@@ -213,7 +223,7 @@ def correction():
     
     for df in range(len(all_tc_group)):
         print("Thermocouple ",nam_tc[df],":")
-        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[:7])
+        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[6:])
     
     return all_sonics, all_tc_group
 
@@ -297,8 +307,8 @@ def saver_b8():
     
     all_sonics, all_tc_group= correction()
     
-    #TS = input("Would you like to have a single time stamp column? (y/n):")
-    TS = "y" 
+    TS = input("Would you like to have a single time stamp column? (y/n):")
+    #TS = "y" 
     if TS== "y":
         for i in range(len(all_sonics)):
             all_sonics[i] = timestamp_col(all_sonics[i])

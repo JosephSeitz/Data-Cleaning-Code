@@ -55,7 +55,9 @@ def compiler_b7():
 
     t_s,t_e = timestamp_matcher(df_names,file_num)
     t_s='2018-05-09 10:15:38.4'
-    trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    #trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    trim_df = "y"
+    print("Triming the timestamps")
     if trim_df.lower() == "y":
         df_2879 = cutter(df_2879, t_s, t_e)
         df_3884 = cutter(df_3884, t_s, t_e)
@@ -70,6 +72,7 @@ def compiler_b7():
                df_11584, df_11585]
     #check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
     check = "y"
+    print("Removing repeat timestamps")
     if check == "y":
         end_repeat_times = []
         for i in range(len(df_names)):
@@ -138,17 +141,19 @@ def compiler_b7():
         
     for n in range(len(a_row_lst)):
         
+        for i in range(len(time_columns_lst)):
+            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
+            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
+            c_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
+            d_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
+        
         for i in range(len(sonic_columns)):
             a_row_lst[n][sonc_headers[i]] = df_4975[sonic_columns[i]+str(n+1)]
             b_row_lst[n][sonc_headers[i]] = df_10442[sonic_columns[i]+str(n+1)]
             c_row_lst[n][sonc_headers[i]] = df_11584[sonic_columns[i]+str(n+1)]
             d_row_lst[n][sonc_headers[i]] = df_4390[sonic_columns[i]+str(n+1)]
         
-        for i in range(len(time_columns_lst)):
-            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
-            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
-            c_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
-            d_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
+        
 
     #### Thermal Couple data
     time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
@@ -174,11 +179,13 @@ def compiler_b7():
     df_time_lst_1 =[df_4975_time, df_2879_time, df_3884_time, df_10442_time,\
                     df_11585_time, df_4976_time, df_4390_time, df_11584_time]
     for j in range(len(first_tc_group)):
+        for t in range(len(time_columns_lst)):
+            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_1)):
             first_tc_group[j][t_c_lst_1[i]]= df_tc_lst_1[j][t_c_lst_1[i]]
            
-        for t in range(len(time_columns_lst)):
-            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
     
     df_tc_lst_2 = [df_2879, df_4975, df_10442, df_4976, df_11585, df_11584]
     
@@ -186,11 +193,13 @@ def compiler_b7():
                    df_11585_time, df_11584_time]
     
     for j in range(len(secnd_tc_group)):
+        for t in range(len(time_columns_lst)):
+            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_2)):
             secnd_tc_group[j][t_c_lst_2[i]]= df_tc_lst_2[j][t_c_lst_2[i]]
            
-        for t in range(len(time_columns_lst)):
-            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
    
     all_tc_group = [df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc, df_B5_tc,\
                     df_B6_tc, df_B7_tc,df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc,\
@@ -229,7 +238,7 @@ def correction():
     #df_WGNover = apply_correction(df_WGNover,u_fctr,v_fctr,m_speed,min_T,fill_nan)
     for df in range(len(all_tc_group)):
         print("Thermocouple ",nam_tc[df],":")
-        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[:7])
+        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[6:])
         
     
     return all_sonics, all_tc_group #, df_WGNover

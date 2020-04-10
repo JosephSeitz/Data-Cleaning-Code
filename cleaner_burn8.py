@@ -124,12 +124,18 @@ def compiler_b8():
     df_2878_time = time_columns(df_2878)
     df_WGNover = pd.DataFrame()
     
-    for col in range(len(sonic_columns)):
-        df_WGNover[sonc_headers[col]] = df_2878[sonic_columns[col]+"1"]
     for t in time_columns_lst:
         df_WGNover[t] = df_2878_time[t]
+    for col in range(len(sonic_columns)):
+        df_WGNover[sonc_headers[col]] = df_2878[sonic_columns[col]+"1"]
+    
         
     for n in range(len(a_row_lst)):
+        for i in range(len(time_columns_lst)):
+            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
+            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
+            c_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
+            d_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
         
         for i in range(len(sonic_columns)):
             a_row_lst[n][sonc_headers[i]] = df_4975[sonic_columns[i]+str(n+1)]
@@ -137,11 +143,7 @@ def compiler_b8():
             c_row_lst[n][sonc_headers[i]] = df_4390[sonic_columns[i]+str(n+1)]
             d_row_lst[n][sonc_headers[i]] = df_11584[sonic_columns[i]+str(n+1)]
         
-        for i in range(len(time_columns_lst)):
-            a_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
-            b_row_lst[n][time_columns_lst[i]]=df_10442_time[time_columns_lst[i]]
-            c_row_lst[n][time_columns_lst[i]]=df_4390_time[time_columns_lst[i]]
-            d_row_lst[n][time_columns_lst[i]]=df_11584_time[time_columns_lst[i]]
+        
 
     #### Thermal Couple data
     time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
@@ -167,11 +169,13 @@ def compiler_b8():
     df_time_lst_1 =[df_4975_time, df_2879_time, df_3884_time, df_10442_time,\
                     df_11585_time, df_4976_time, df_4390_time, df_11584_time]
     for j in range(len(first_tc_group)):
+        for t in range(len(time_columns_lst)):
+            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_1)):
             first_tc_group[j][t_c_lst_1[i]]= df_tc_lst_1[j][t_c_lst_1[i]]
            
-        for t in range(len(time_columns_lst)):
-            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+       
     
     df_tc_lst_2 = [df_2879, df_4975, df_10442, df_4976, df_11585, df_11584]
     
@@ -179,11 +183,13 @@ def compiler_b8():
                    df_11585_time, df_11584_time]
     
     for j in range(len(secnd_tc_group)):
+        for t in range(len(time_columns_lst)):
+            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_2)):
             secnd_tc_group[j][t_c_lst_2[i]]= df_tc_lst_2[j][t_c_lst_2[i]]
            
-        for t in range(len(time_columns_lst)):
-            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+        
    
     all_tc_group = [df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc, df_B5_tc,\
                     df_B6_tc, df_B7_tc,df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc,\
@@ -223,7 +229,7 @@ def correction():
     
     for df in range(len(all_tc_group)):
         print("Thermocouple ",nam_tc[df],":")
-        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[:7])
+        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[6:])
         
     return all_sonics, all_tc_group, df_WGNover
 
