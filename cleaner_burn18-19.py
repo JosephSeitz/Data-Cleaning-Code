@@ -17,6 +17,7 @@ if Burn ==18:
     path = "http://35.12.130.8/study/Seitz/10X10_Truss_SERDP_Burns/Raw-Sonic-TC-Data/SERDP-Burn-18/"
 if Burn == 19:
     path = "http://35.12.130.8/study/Seitz/10X10_Truss_SERDP_Burns/Raw-Sonic-TC-Data/SERDP-Burn-19/"
+seperate_time = input("Would you like to seperate the Timestamp? (y/n)")
 
 def compiler():
     files = ["TOA5_2878.WGcontrol10Hz.dat", "TOA5_2879.ts_data.dat",\
@@ -51,7 +52,8 @@ def compiler():
         t_s = "2018-09-22 09:05:42"
         t_e = "2018-09-22 15:19:33"
         
-    trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    #trim_df = input("Would you like to trim the data to these timestamps? (y/n):")
+    trim_df = "y"
     if trim_df.lower() == "y":
         df_2878 = cutter(df_2878, t_s, t_e)
         df_2879 = cutter(df_2879, t_s, t_e)
@@ -66,7 +68,8 @@ def compiler():
     df_names= [df_2878, df_2879, df_3884, df_4390, df_4975, df_4976, df_10442, df_11584, df_11585]
     
 
-    check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    #check = input("Would you like to check for repeated timestamps? Note: if there are repeats, it could take a while (y/n):")
+    check = "y"
     if check == "y":
         end_repeat_times = []
         for i in range(len(df_names)):
@@ -76,7 +79,8 @@ def compiler():
         print("Cut here:",max(end_repeat_times))
         t_s = max(end_repeat_times)
         #t_e = pd.TimeStamp("2018-09-22 15:19:33.500000")
-        cut_out_repeat = input("Would you like to cut all data at the end of the repeated times? (y/n):")
+        #cut_out_repeat = input("Would you like to cut all data at the end of the repeated times? (y/n):")
+        cut_out_repeat = "y"
         if cut_out_repeat == "y":     
             df_2878 = continuous_df(cutter(df_2878, t_s, t_e), t_s, t_e)
             df_2879 = continuous_df(cutter(df_2879, t_s, t_e), t_s, t_e)
@@ -113,8 +117,8 @@ def compiler():
     all_sonics = a_row_lst+ b_row_lst + c_row_lst +d_row_lst
     
     ###  Burns truss:
-    #seperate_time = input("Would you like to seperate the Timestamp? (y/n)")
-    seperate_time = "n"
+    
+    #seperate_time = "n"
     if seperate_time == "y":
         df_2879_time, df_4975_time  = time_columns(df_2879), time_columns(df_4975)
         df_4976_time, df_11585_time = time_columns(df_4976), time_columns(df_11585)
@@ -240,9 +244,16 @@ def correction():
         all_sonics[df] = apply_correction(all_sonics[df],u_fctr,v_fctr,m_speed,min_T,fill_nan)
     df_WGNover = apply_correction(df_WGNover,u_fctr,v_fctr,m_speed,min_T,fill_nan)
     
-    for df in range(len(all_tc_group)):
-        print("Thermocouple ",nam_tc[df],":")
-        all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[1:8])
+ 
+    if seperate_time == "y":
+        for df in range(len(all_tc_group)):
+            print("Thermocouple ",nam_tc[df],":")
+            all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[6:])
+    
+    if seperate_time == "n":
+        for df in range(len(all_tc_group)):
+            print("Thermocouple ",nam_tc[df],":")
+            all_tc_group[df] = apply_tc_correction(all_tc_group[df],min_T,fill_nan,list(all_tc_group[df].columns)[1:8])
         
     return all_sonics, all_tc_group, df_WGNover
 

@@ -15,10 +15,10 @@ Burn = int(input("What Burn would you like to clean? (20-34):"))
     
 def pick_burn(burn):
     
-    #path_20_22 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
-    #                "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/"
-    path_20_22 = "/home/joey/Desktop/10X10_Truss_SERDP_Burns/"\
-                   "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/" #79
+    path_20_22 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
+                    "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/"
+    #path_20_22 = "/home/joey/Desktop/10X10_Truss_SERDP_Burns/"\
+    #               "Raw-Sonic-TC-Data/SERDP-Burns-20-to-22/" #79
     
     path_23_26 = "/Users/joeyp/Desktop/10X10_Truss_SERDP_Burns/"\
                     "Raw-Sonic-TC-Data/SERDP-Burns-23-to-26/"
@@ -138,8 +138,9 @@ def compiler():
     df_lst = [df_4976, df_4976, df_11585, df_2879, df_4390, df_2005,\
               df_2878, df_11584, df_10442]
     
-    check = input("Would you like to check for repeated timestamps? Note: if"\
-              " there are repeats, it could take a while (y/n):")
+    #check = input("Would you like to check for repeated timestamps? Note: if"\
+    #          " there are repeats, it could take a while (y/n):")
+    check = "y"    
     if check == "y":
         end_repeat_times = []
         for i in range(len(df_lst)):
@@ -149,8 +150,9 @@ def compiler():
         if max(end_repeat_times) != t_s:
             
             
-            cut_out_check = input("Would you like to cut all data at the end "\
-                                  " of repeated times? (y/n):")
+            #cut_out_check = input("Would you like to cut all data at the end "\
+            #                      " of repeated times? (y/n):")
+            cut_out_check = "y"
             print("Cut here:",max(end_repeat_times))
             t_s = max(end_repeat_times)
             
@@ -223,6 +225,11 @@ def compiler():
     
         
     for n in range(len(a_row_lst)):
+        for i in range(len(time_columns_lst)):
+            a_row_lst[n][time_columns_lst[i]]=df_4976_time[time_columns_lst[i]]
+            b_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
+            c_row_lst[n][time_columns_lst[i]]=df_11585_time[time_columns_lst[i]]
+            d_row_lst[n][time_columns_lst[i]]=df_2879_time[time_columns_lst[i]]
         
         for i in range(len(sonic_columns)):
             a_row_lst[n][sonc_headers[i]] = df_4976[sonic_columns[i]+str(n+1)]
@@ -230,11 +237,6 @@ def compiler():
             c_row_lst[n][sonc_headers[i]] = df_11585[sonic_columns[i]+str(n+1)]
             d_row_lst[n][sonc_headers[i]] = df_2879[sonic_columns[i]+str(n+1)]
         
-        for i in range(len(time_columns_lst)):
-            a_row_lst[n][time_columns_lst[i]]=df_4976_time[time_columns_lst[i]]
-            b_row_lst[n][time_columns_lst[i]]=df_4975_time[time_columns_lst[i]]
-            c_row_lst[n][time_columns_lst[i]]=df_11585_time[time_columns_lst[i]]
-            d_row_lst[n][time_columns_lst[i]]=df_2879_time[time_columns_lst[i]]
     
     #### Thermal Couple data
     time_columns_lst=["YYYY","MM","DD","Hr","Min","Sec"]
@@ -265,11 +267,13 @@ def compiler():
                     df_11585_time, df_2878_time, df_2879_time, df_11584_time]
     
     for j in range(len(first_tc_group)):
+        for t in range(len(time_columns_lst)):
+            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
         for i in range(len(t_c_lst_1)):
             first_tc_group[j][t_c_lst_1[i]]= df_tc_lst_1[j][t_c_lst_1[i]]
     
-        for t in range(len(time_columns_lst)):
-            first_tc_group[j][time_columns_lst[t]]= df_time_lst_1[j][time_columns_lst[t]]
+        
     
     df_tc_lst_2 = [df_4976, df_4975, df_2005, df_11585, df_2879, df_11584]
     
@@ -277,11 +281,12 @@ def compiler():
                    df_2879_time, df_11584_time]
     
     for j in range(len(secnd_tc_group)):
+        for t in range(len(time_columns_lst)):
+            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
+            
         for i in range(len(t_c_lst_2)):
             secnd_tc_group[j][t_c_lst_2[i]]= df_tc_lst_2[j][t_c_lst_2[i]]
     
-        for t in range(len(time_columns_lst)):
-            secnd_tc_group[j][time_columns_lst[t]]= df_time_lst_2[j][time_columns_lst[t]]
     
     all_tc_group = [df_B1_tc, df_B2_tc, df_B3_tc, df_B4_tc, df_B5_tc,\
                     df_B6_tc, df_B7_tc,df_C1_tc, df_C2_tc, df_C3_tc, df_C4_tc,\
@@ -327,7 +332,7 @@ def correction():
     for df in range(len(all_tc_group)):
         print("Thermocouple ",nam_tc[df],":")
         all_tc_group[df] = apply_tc_correction(all_tc_group[df], min_T, \
-                    fill_nan, list(all_tc_group[df].columns)[:7])
+                    fill_nan, list(all_tc_group[df].columns)[6:])
         
     return all_sonics, all_tc_group, df_WGNover
 
